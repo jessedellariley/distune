@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">Distune</string>
+
+    <string name="back4app_server_url">https://parseapi.back4app.com/</string>
+    <string name="back4app_app_id">hRZqaGodcCRIyhCt3yWQH1IpLQyhtTPhJbC5V9wX</string>
+    <string name="back4app_client_key">6OjrJ5Fb5oMRaWW1sT8KWZhheZLgWUP0M5SJcz9d</string>
+
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
