@@ -2,7 +2,6 @@ package com.example.distune
 
 import com.parse.ParseClassName
 import com.parse.ParseObject
-import com.parse.ParseUser
 
 @ParseClassName("Track")
 class Track : ParseObject() {
