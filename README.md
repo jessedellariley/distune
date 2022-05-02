@@ -12,19 +12,13 @@ The goal is to get music recommendations from real people with shared taste.
 ### 1. User Stories
 
 - [x] User signs in through Spotify to access their account
-- [ ] User picks their top 3 songs for each of their favorite genres
-- [ ] A new user completes a short questionnaire to choose which playlists are publically available and which genres they want to display
+- [x] User picks their top 3 songs for each of their favorite genres
 - [ ] User can discover new users to follow by swiping right or left on their top 3 songs in a shared genre
 - [ ] User can view recommended user's playlists once they’ve swiped right
-- [ ] User can display profile information (about, following, followers)
+- [ ] User can display profile information (bio, following, followers)
 - [x] User's playlists appear in profile and can be clicked on and listened to
 - [ ] User can access the music and profiles of those they are following
-- [ ] User can log out
-- [ ] User can create new playlists or add to existing playlists in-app
-- [ ] Settings section (accessiblity, notifications, general, etc.)
-- [ ] User can choose whether to find music by shared/similar artists rather than by shared genres
-- [ ] User can choose to have their genre and artist preferences auto-generated based on their playlists rather than choosing manually
-- [ ] User can choose to get random recommendations (not based on any of their favorites) or popular recommendations (based on what most people are listening to)
+- [x] User can log out
 
 ### 2. Screen Archetypes
 
