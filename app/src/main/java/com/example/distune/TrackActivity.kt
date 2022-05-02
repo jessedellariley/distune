@@ -1,5 +1,6 @@
 package com.example.distune
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.widget.TextView
@@ -12,11 +13,20 @@ import okhttp3.*
 import org.json.JSONObject
 import java.io.IOException
 import android.widget.ImageView
+import androidx.fragment.app.Fragment
+import com.example.distune.fragments.DiscoverFragment
+import com.example.distune.fragments.ProfileFragment
+import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.button.MaterialButton
 import com.spotify.android.appremote.api.ConnectionParams
 import com.spotify.android.appremote.api.Connector
 import com.spotify.android.appremote.api.SpotifyAppRemote
+import com.spotify.protocol.client.CallResult
+import com.spotify.protocol.client.Result
 import com.spotify.protocol.types.Track
+import com.spotify.protocol.types.ListItem
+import com.spotify.protocol.types.ListItems
+import java.util.concurrent.TimeUnit
 
 private const val GET_PLAYLIST_TRACKS_URL = "https://api.spotify.com/v1/playlists/"
 class TrackActivity : AppCompatActivity() {
@@ -33,6 +43,9 @@ class TrackActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_track)
+
+        findViewById<BottomNavigationView>(R.id.trackBottomNav).selectedItemId = R.id.action_invisible
+
         rvTracks = findViewById(R.id.trackRecyclerView)
 
         adapter = TrackAdapter(this,allTracks)
@@ -68,6 +81,28 @@ class TrackActivity : AppCompatActivity() {
                 }
             }
         })
+
+        findViewById<BottomNavigationView>(R.id.trackBottomNav).setOnItemSelectedListener {
+                item ->
+            val i = Intent(this,MainActivity::class.java)
+            when(item.itemId) {
+
+                R.id.action_discover -> {
+                    i.putExtra("FRAGMENT_TO_LOAD", "discover")
+                    startActivity(i)
+                }
+                R.id.action_profile -> {
+                    i.putExtra("FRAGMENT_TO_LOAD", "profile")
+                    startActivity(i)
+                }
+                R.id.action_logout -> {
+                    // TODO: create logout
+                }
+            }
+
+            // Return true to say that we've handle this user interaction on the item
+            true
+        }
     }
 
     // Handles retrieval of tracks for RecyclerView

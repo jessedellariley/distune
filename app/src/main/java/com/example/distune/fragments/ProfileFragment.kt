@@ -1,18 +1,20 @@
 package com.example.distune.fragments
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import android.widget.TextView
 import androidx.fragment.app.FragmentManager
+import com.example.distune.EditProfileActivity
 import com.example.distune.R
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.parse.ParseUser
 
 class ProfileFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -24,6 +26,14 @@ class ProfileFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+
+        view.findViewById<TextView>(R.id.tv_username).text = ParseUser.getCurrentUser().username
+        view.findViewById<TextView>(R.id.tv_bio).text = ParseUser.getCurrentUser().getString("bio")
+
+        view.findViewById<ImageView>(R.id.ivEditProfile).setOnClickListener() {
+            var i = Intent(requireContext(), EditProfileActivity::class.java)
+            startActivity(i)
+        }
 
         val fragmentManager: FragmentManager = childFragmentManager
 

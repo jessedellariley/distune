@@ -47,7 +47,7 @@ class PlaylistFragment : Fragment() {
 
     private fun getCurrentUserPlaylists() {
         var client = OkHttpClient()
-        var token = ParseUser.getCurrentUser().getString("accessToken")
+        var token = ParseUser.getCurrentUser().getString("token")
         var httpBuilder : HttpUrl.Builder = HttpUrl.parse(CURRENT_USER_PLAYLISTS_URL)!!.newBuilder()
         httpBuilder.addQueryParameter("limit","50")
         val request = Request.Builder()

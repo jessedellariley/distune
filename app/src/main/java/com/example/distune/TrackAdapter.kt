@@ -1,6 +1,7 @@
 package com.example.distune
 
 import android.content.Context
+import android.graphics.Color
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -43,7 +44,7 @@ class TrackAdapter(val context: Context, private val tracks: List<Track>) : Recy
         override fun onClick(p0: View?) {
             val track = tracks[adapterPosition].getId()
             // change the color of the song to show that it is playing
-
+            tvSongTitle.setTextColor(Color.parseColor("#FF57B55A"))
             // start playing the song
 
         }

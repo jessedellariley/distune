@@ -13,7 +13,21 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        var fragmentToLoad = intent.getStringExtra("FRAGMENT_TO_LOAD")
+
         val fragmentManager: FragmentManager = supportFragmentManager
+
+        if (fragmentToLoad.equals("discover")) {
+            fragmentManager.beginTransaction().replace(R.id.flMainContainer,DiscoverFragment()).commit()
+            findViewById<BottomNavigationView>(R.id.bottomNavigationView).selectedItemId = R.id.action_discover
+        } else if (fragmentToLoad.equals("profile")) {
+            fragmentManager.beginTransaction().replace(R.id.flMainContainer,ProfileFragment()).commit()
+            findViewById<BottomNavigationView>(R.id.bottomNavigationView).selectedItemId = R.id.action_profile
+        } else {
+            // Set default selection
+            fragmentManager.beginTransaction().replace(R.id.flMainContainer,DiscoverFragment()).commit()
+            findViewById<BottomNavigationView>(R.id.bottomNavigationView).selectedItemId = R.id.action_discover
+        }
 
         findViewById<BottomNavigationView>(R.id.bottomNavigationView).setOnItemSelectedListener {
                 item ->
@@ -40,7 +54,5 @@ class MainActivity : AppCompatActivity() {
             true
         }
 
-        // Set default selection
-        findViewById<BottomNavigationView>(R.id.bottomNavigationView).selectedItemId = R.id.action_discover
     }
 }

@@ -54,11 +54,7 @@ class LoginActivity : AppCompatActivity() {
                             var spotifyId = responseBody.getString("id")
                             Log.d("LoginActivity", "Retrieved Spotify account info for $username")
                             // Use Spotify profile to login or sign up ParseUser
-                            if (ParseUser.getCurrentUser() != null && ParseUser.getCurrentUser().username.equals(username)) {
-                                ParseUser.getCurrentUser().put("accessToken",token)
-                            } else {
-                                loginUser(username, spotifyId, spotifyId, token)
-                            }
+                            loginUser(username,spotifyId,spotifyId,token)
                             goToMainActivity()
                         }
                     }
@@ -82,7 +78,7 @@ class LoginActivity : AppCompatActivity() {
         // Set fields for the user to be created
         user.setUsername(username)
         user.setPassword(password)
-        user.put("accessToken", accessToken)
+        user.put("token", accessToken)
         user.put("spotifyId", spotifyId)
 
         user.signUpInBackground { e ->
@@ -123,8 +119,9 @@ class LoginActivity : AppCompatActivity() {
 
     private fun loginViaSpotify() {
         var builder = AuthorizationRequest.Builder(CLIENT_ID, AuthorizationResponse.Type.TOKEN, REDIRECT_URI)
-        builder.setScopes(Array<String>(1){"streaming"})
+        builder.setScopes(Array<String>(1){"user-top-read,user-library-read,user-read-email,user-read-private"})
         var request = builder.build()
+        Log.d("LoginActivity", "Opening Spotify login activity")
         AuthorizationClient.openLoginActivity(this,REQUEST_CODE,request)
     }
 
