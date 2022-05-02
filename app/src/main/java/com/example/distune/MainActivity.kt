@@ -1,5 +1,6 @@
 package com.example.distune
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -7,6 +8,7 @@ import androidx.fragment.app.FragmentManager
 import com.example.distune.fragments.DiscoverFragment
 import com.example.distune.fragments.ProfileFragment
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.parse.ParseUser
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -42,7 +44,10 @@ class MainActivity : AppCompatActivity() {
                     fragmentToShow = ProfileFragment()
                 }
                 R.id.action_logout -> {
-
+                    ParseUser.logOutInBackground()
+                    val i = Intent(this,LoginActivity::class.java)
+                    i.putExtra("LOGGED_OUT","logged_out")
+                    startActivity(i)
                 }
             }
 

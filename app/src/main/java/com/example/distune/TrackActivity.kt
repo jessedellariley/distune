@@ -96,7 +96,10 @@ class TrackActivity : AppCompatActivity() {
                     startActivity(i)
                 }
                 R.id.action_logout -> {
-                    // TODO: create logout
+                    ParseUser.logOutInBackground()
+                    val i = Intent(this,LoginActivity::class.java)
+                    i.putExtra("LOGGED_OUT","logged_out")
+                    startActivity(i)
                 }
             }
 
