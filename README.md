@@ -19,6 +19,14 @@ The goal is to get music recommendations from real people with shared taste.
 - [x] User can access the music and profiles of those they are following
 - [x] User can log out
 
+### Video Walkthrough
+
+Here's a walkthrough of implemented user stories:
+
+<img src='walkthrough.gif' title='Video Walkthrough' width=224 alt='Video Walkthrough' />
+
+GIF created with [LiceCap](http://www.cockos.com/licecap/).
+
 ### 2. Screen Archetypes
 
 * Spotify login

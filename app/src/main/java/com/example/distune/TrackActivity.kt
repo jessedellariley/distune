@@ -212,12 +212,12 @@ class TrackActivity : AppCompatActivity() {
         SpotifyAppRemote.connect(this, connectionParams, object: Connector.ConnectionListener {
             override fun onConnected(appRemote: SpotifyAppRemote) {
                 spotifyAppRemote = appRemote
-                Log.d("MainActivity", "Connected! Yay!")
+                Log.d("TrackActivity", "Connected! Yay!")
                 connected()
             }
 
             override fun onFailure(throwable: Throwable) {
-                Log.e("MainActivity", throwable.message, throwable)
+                Log.e("TrackActivity", throwable.message, throwable)
             }
         })
     }

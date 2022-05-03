@@ -1,6 +1,7 @@
 package com.example.distune.fragments
 
 import android.os.Bundle
+import android.provider.ContactsContract
 import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
@@ -12,15 +13,49 @@ import androidx.constraintlayout.widget.ConstraintLayout
 import com.bumptech.glide.Glide
 import com.example.distune.Follower
 import com.example.distune.R
+import com.google.android.material.button.MaterialButton
 import com.parse.FindCallback
 import com.parse.ParseException
 import com.parse.ParseQuery
 import com.parse.ParseUser
+import com.spotify.android.appremote.api.ConnectionParams
+import com.spotify.android.appremote.api.Connector
+import com.spotify.android.appremote.api.SpotifyAppRemote
+import com.spotify.protocol.types.Image
+import com.spotify.protocol.types.Track
 import org.json.JSONArray
 
 lateinit var usersToDiscover : JSONArray
+private val CLIENT_ID = "fcc35d2c1acf43208e5e83d87e89b4e1"
+private val REDIRECT_URI = "distune-login://callback"
+private var spotifyAppRemote: SpotifyAppRemote? = null
 
 class DiscoverFragment : Fragment() {
+
+    lateinit var noUsers: TextView
+    lateinit var constraintLayout: ConstraintLayout
+    lateinit var swipeRight: ImageView
+    lateinit var swipeLeft: ImageView
+    lateinit var username: TextView
+    lateinit var bio: TextView
+    lateinit var discover1Title: TextView
+    lateinit var discover1Album: ImageView
+    lateinit var discover1Artist: TextView
+    lateinit var discover2Title: TextView
+    lateinit var discover2Album: ImageView
+    lateinit var discover2Artist: TextView
+    lateinit var discover3Title: TextView
+    lateinit var discover3Album: ImageView
+    lateinit var discover3Artist: TextView
+    lateinit var discover1: ConstraintLayout
+    lateinit var discover2: ConstraintLayout
+    lateinit var discover3: ConstraintLayout
+    lateinit var toggle: ImageView
+    lateinit var discoverListen: ConstraintLayout
+    lateinit var discoverListenTitle: TextView
+    lateinit var discoverListenAlbum: ImageView
+    lateinit var discoverListenArtist: TextView
+    var i = 0
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -35,24 +70,32 @@ class DiscoverFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        var noUsers = view.findViewById<TextView>(R.id.noUsers)
-        var constraintLayout = view.findViewById<ConstraintLayout>(R.id.constraintLayout)
-        var swipeRight = view.findViewById<ImageView>(R.id.swipeRight)
-        var swipeLeft = view.findViewById<ImageView>(R.id.swipeLeft)
-        var username = view.findViewById<TextView>(R.id.tv_username)
-        var bio = view.findViewById<TextView>(R.id.tv_bio)
+        noUsers = view.findViewById(R.id.noUsers)
+        constraintLayout = view.findViewById(R.id.constraintLayout)
+        swipeRight = view.findViewById(R.id.swipeRight)
+        swipeLeft = view.findViewById(R.id.swipeLeft)
+        username = view.findViewById(R.id.tv_username)
+        bio = view.findViewById(R.id.tv_bio)
         // var image = view.findViewById<ImageView>(R.id.iv_profile_image)
-        var discover1Title = view.findViewById<TextView>(R.id.discover1Title)
-        var discover1Album = view.findViewById<ImageView>(R.id.discover1Album)
-        var discover1Artist = view.findViewById<TextView>(R.id.discover1Artist)
-        var discover2Title = view.findViewById<TextView>(R.id.discover2Title)
-        var discover2Album = view.findViewById<ImageView>(R.id.discover2Album)
-        var discover2Artist = view.findViewById<TextView>(R.id.discover2Artist)
-        var discover3Title = view.findViewById<TextView>(R.id.discover3Title)
-        var discover3Album = view.findViewById<ImageView>(R.id.discover3Album)
-        var discover3Artist = view.findViewById<TextView>(R.id.discover3Artist)
+        discover1Title = view.findViewById(R.id.discover1Title)
+        discover1Album = view.findViewById(R.id.discover1Album)
+        discover1Artist = view.findViewById(R.id.discover1Artist)
+        discover2Title = view.findViewById(R.id.discover2Title)
+        discover2Album = view.findViewById(R.id.discover2Album)
+        discover2Artist = view.findViewById(R.id.discover2Artist)
+        discover3Title = view.findViewById(R.id.discover3Title)
+        discover3Album = view.findViewById(R.id.discover3Album)
+        discover3Artist = view.findViewById(R.id.discover3Artist)
+        discover1 = view.findViewById(R.id.discover1)
+        discover2 = view.findViewById(R.id.discover2)
+        discover3 = view.findViewById(R.id.discover3)
+        toggle = view.findViewById(R.id.toggle)
+        discoverListen = view.findViewById(R.id.discoverListen)
+        discoverListenTitle = view.findViewById(R.id.discoverListenTitle)
+        discoverListenAlbum = view.findViewById(R.id.discoverListenAlbumThumbnail)
+        discoverListenArtist = view.findViewById(R.id.discoverListenArtist)
 
-        var i = 0
+        i = 0
         if (usersToDiscover.length() > 0) {
             // Load first user
             Log.d("DiscoverFragment", "Attempting to load user")
@@ -303,6 +346,122 @@ class DiscoverFragment : Fragment() {
             swipeRight.visibility = View.INVISIBLE
             swipeLeft.visibility = View.INVISIBLE
             noUsers.visibility = View.VISIBLE
+        }
+    }
+
+    // The following three functions handle the audio player
+    override fun onStart() {
+        super.onStart()
+
+        val connectionParams = ConnectionParams.Builder(CLIENT_ID)
+            .setRedirectUri(REDIRECT_URI)
+            .showAuthView(true)
+            .build()
+
+        SpotifyAppRemote.connect(requireContext(), connectionParams, object: Connector.ConnectionListener {
+            override fun onConnected(appRemote: SpotifyAppRemote) {
+                spotifyAppRemote = appRemote
+                Log.d("DiscoverFragment", "Connected! Yay!")
+                connected()
+            }
+
+            override fun onFailure(throwable: Throwable) {
+                Log.e("DiscoverFragment", throwable.message, throwable)
+            }
+        })
+    }
+
+    private fun connected() {
+        spotifyAppRemote!!.playerApi.subscribeToPlayerState().setEventCallback {
+            val track: Track = it.track
+            discoverListenTitle.text = track.name
+            discoverListenArtist.text = track.artist.name
+        }
+
+        toggle.setOnClickListener() {
+            if (toggle.isActivated) { // pause button showing
+                toggle.isActivated = !toggle.isActivated
+                spotifyAppRemote!!.playerApi.pause()
+            } else { // play button showing
+                toggle.isActivated = !toggle.isActivated
+                spotifyAppRemote!!.playerApi.resume()
+            }
+        }
+
+        discover1.setOnClickListener() {
+            discoverListen.visibility = View.VISIBLE
+            discoverListenTitle.text = discover1Title.text
+            discoverListenArtist.text = discover1Artist.text
+            Glide.with(requireContext())
+                .load(
+                    usersToDiscover.getJSONObject(i)
+                        .getJSONArray("favorites")
+                        .getJSONObject(0)
+                        .getString("image")
+                )
+                .into(discoverListenAlbum)
+            var spotifyId = usersToDiscover.getJSONObject(i)
+                .getJSONArray("favorites")
+                .getJSONObject(0)
+                .getString("spotifyId")
+            // Start playing playlist
+            spotifyAppRemote!!.playerApi.play("spotify:track:$spotifyId")
+            // Toggle bottom audio bar button to pause
+            if (!toggle.isActivated)
+                toggle.isActivated = !toggle.isActivated
+        }
+
+        discover2.setOnClickListener() {
+            discoverListen.visibility = View.VISIBLE
+            discoverListenTitle.text = discover2Title.text
+            discoverListenArtist.text = discover2Artist.text
+            Glide.with(requireContext())
+                .load(
+                    usersToDiscover.getJSONObject(i)
+                        .getJSONArray("favorites")
+                        .getJSONObject(1)
+                        .getString("image")
+                )
+                .into(discoverListenAlbum)
+            var spotifyId = usersToDiscover.getJSONObject(i)
+                .getJSONArray("favorites")
+                .getJSONObject(1)
+                .getString("spotifyId")
+            // Start playing playlist
+            spotifyAppRemote!!.playerApi.play("spotify:track:$spotifyId")
+            // Toggle bottom audio bar button to pause
+            if (!toggle.isActivated)
+                toggle.isActivated = !toggle.isActivated
+        }
+
+        discover3.setOnClickListener() {
+            discoverListen.visibility = View.VISIBLE
+            discoverListenTitle.text = discover3Title.text
+            discoverListenArtist.text = discover3Artist.text
+            Glide.with(requireContext())
+                .load(
+                    usersToDiscover.getJSONObject(i)
+                        .getJSONArray("favorites")
+                        .getJSONObject(2)
+                        .getString("image")
+                )
+                .into(discoverListenAlbum)
+            var spotifyId = usersToDiscover.getJSONObject(i)
+                .getJSONArray("favorites")
+                .getJSONObject(2)
+                .getString("spotifyId")
+            // Start playing playlist
+            spotifyAppRemote!!.playerApi.play("spotify:track:$spotifyId")
+            // Toggle bottom audio bar button to pause
+            if (!toggle.isActivated)
+                toggle.isActivated = !toggle.isActivated
+        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        spotifyAppRemote?.let {
+            SpotifyAppRemote.disconnect(it)
         }
     }
 }

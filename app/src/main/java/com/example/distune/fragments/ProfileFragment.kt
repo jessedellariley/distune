@@ -42,12 +42,13 @@ class ProfileFragment : Fragment() {
         view.findViewById<TextView>(R.id.tv_username).text = userForProfile?.username
         view.findViewById<TextView>(R.id.tv_bio).text = userForProfile?.getString("bio")
 
-        if (ParseUser.getCurrentUser().equals(userForProfile)) {
+        if (ParseUser.getCurrentUser().username.equals(userForProfile.username)) {
             view.findViewById<ImageView>(R.id.ivEditProfile).visibility = View.VISIBLE
-            view.findViewById<ImageView>(R.id.ivEditProfile).setOnClickListener() {
-                var i = Intent(requireContext(), EditProfileActivity::class.java)
-                startActivity(i)
-            }
+        }
+
+        view.findViewById<ImageView>(R.id.ivEditProfile).setOnClickListener() {
+            var i = Intent(requireContext(), EditProfileActivity::class.java)
+            startActivity(i)
         }
 
         val fragmentManager: FragmentManager = childFragmentManager
