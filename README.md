@@ -23,7 +23,7 @@ The goal is to get music recommendations from real people with shared taste.
 
 Here's a walkthrough of implemented user stories:
 
-<img src='walkthrough.gif' title='Video Walkthrough' width=112 alt='Video Walkthrough' />
+<img src='walkthrough.gif' title='Video Walkthrough' width=279 alt='Video Walkthrough' />
 
 GIF created with [LiceCap](http://www.cockos.com/licecap/).
 
