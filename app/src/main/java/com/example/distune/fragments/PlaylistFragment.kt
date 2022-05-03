@@ -62,8 +62,10 @@ class PlaylistFragment : Fragment() {
             override fun onResponse(call: Call, response: Response) {
                 response.use {
                     if (!response.isSuccessful) throw IOException("Unexpected code $response")
+                    Log.d("PlaylistFragment", "Retrieved playlists from Spotify")
                     val responseBody = JSONObject(response.body()!!.string())
                     var responseItems = responseBody.getJSONArray("items")
+                    Log.d("PlaylistFragment",responseItems.toString())
                     for (i in 0 until responseItems.length()) {
                         val playlistInfo = responseItems.getJSONObject(i)
                         if (playlistInfo.getJSONObject("owner").getString("display_name").equals(ParseUser.getCurrentUser().username) && playlistInfo["type"].equals("playlist")) {

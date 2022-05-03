@@ -13,8 +13,7 @@ The goal is to get music recommendations from real people with shared taste.
 
 - [x] User signs in through Spotify to access their account
 - [x] User picks their top 3 songs for each of their favorite genres
-- [ ] User can discover new users to follow by swiping right or left on their top 3 songs in a shared genre
-- [ ] User can view recommended user's playlists once they’ve swiped right
+- [ ] User can discover new users to follow by swiping right or left on their top 3 songs
 - [ ] User can display profile information (bio, following, followers)
 - [x] User's playlists appear in profile and can be clicked on and listened to
 - [ ] User can access the music and profiles of those they are following

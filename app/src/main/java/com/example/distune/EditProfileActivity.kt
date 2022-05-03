@@ -180,29 +180,65 @@ class EditProfileActivity : AppCompatActivity() {
             override fun onResponse(call: Call, response: Response) {
                 response.use {
                     if (!response.isSuccessful) throw IOException("Unexpected code $response")
+                    Log.d("EditProfileActivity","Retreived top tracks")
                     val responseBody = JSONObject(response.body()!!.string())
                     val responseItems = responseBody.getJSONArray("items")
                     for (i in 0 until responseItems.length()) {
                         val trackInfo = responseItems.getJSONObject(i)
-                        var track = Favorite()
+                        val query: ParseQuery<Favorite> = ParseQuery.getQuery(Favorite::class.java)
+                        query.whereEqualTo(Favorite.KEY_USER,ParseUser.getCurrentUser())
+                        query.whereEqualTo(Favorite.KEY_INDEX,i)
+                        query.findInBackground(object : FindCallback<Favorite> {
+                            override fun done(results: MutableList<Favorite>?, e: ParseException?) {
+                                if (e != null) {
+                                    // Something has gone wrong
+                                    Log.e("EditProfileAcivity", "Error fetching playlists")
+                                    e.printStackTrace()
+                                } else {
+                                    if (results != null && results.size > 0) {
+                                        for (result in results) {
+                                            result.setId(trackInfo.getString("id"))
+                                            result.setTitle(trackInfo.getString("name"))
+                                            result.setImage(trackInfo.getJSONObject("album").getJSONArray("images").getJSONObject(0).getString("url"))
+                                            result.setArtist(trackInfo.getJSONArray("artists").getJSONObject(0).getString("name"))
+                                            result.setUser(ParseUser.getCurrentUser())
+                                            result.setIndex(i)
 
-                        track.setId(trackInfo.getString("id"))
-                        track.setTitle(trackInfo.getString("name"))
-                        track.setImage(trackInfo.getJSONObject("album").getJSONArray("images").getJSONObject(0).getString("url"))
-                        track.setArtist(trackInfo.getJSONArray("artists").getJSONObject(0).getString("name"))
-                        track.setUser(ParseUser.getCurrentUser())
-                        track.setIndex(i)
+                                            result.saveInBackground {
+                                                if (it != null) {
+                                                    it.localizedMessage?.let { message ->
+                                                        Log.e(
+                                                            "EditProfileActivity",
+                                                            message
+                                                        )
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    } else {
+                                        var track = Favorite()
 
-                        track.saveInBackground {
-                            if (it != null) {
-                                it.localizedMessage?.let { message ->
-                                    Log.e(
-                                        "EditProfileActivity",
-                                        message
-                                    )
+                                        track.setId(trackInfo.getString("id"))
+                                        track.setTitle(trackInfo.getString("name"))
+                                        track.setImage(trackInfo.getJSONObject("album").getJSONArray("images").getJSONObject(0).getString("url"))
+                                        track.setArtist(trackInfo.getJSONArray("artists").getJSONObject(0).getString("name"))
+                                        track.setUser(ParseUser.getCurrentUser())
+                                        track.setIndex(i)
+
+                                        track.saveInBackground {
+                                            if (it != null) {
+                                                it.localizedMessage?.let { message ->
+                                                    Log.e(
+                                                        "EditProfileActivity",
+                                                        message
+                                                    )
+                                                }
+                                            }
+                                        }
+                                    }
                                 }
                             }
-                        }
+                        })
                     }
                 }
             }

@@ -126,7 +126,7 @@ class LoginActivity : AppCompatActivity() {
 
     private fun loginViaSpotify() {
         var builder = AuthorizationRequest.Builder(CLIENT_ID, AuthorizationResponse.Type.TOKEN, REDIRECT_URI)
-        builder.setScopes(Array<String>(1){"user-top-read,user-library-read,user-read-email,user-read-private"})
+        builder.setScopes(Array<String>(1){"user-top-read,user-library-read,user-read-email,user-read-private,playlist-read-private"})
         var request = builder.build()
         Log.d("LoginActivity", "Opening Spotify login activity")
         AuthorizationClient.openLoginActivity(this,REQUEST_CODE,request)
