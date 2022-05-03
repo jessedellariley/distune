@@ -84,14 +84,14 @@ class TrackActivity : AppCompatActivity() {
 
         findViewById<BottomNavigationView>(R.id.trackBottomNav).setOnItemSelectedListener {
                 item ->
-            val i = Intent(this,MainActivity::class.java)
             when(item.itemId) {
 
                 R.id.action_discover -> {
-                    i.putExtra("FRAGMENT_TO_LOAD", "discover")
+                    val i = Intent(this,SplashActivity::class.java)
                     startActivity(i)
                 }
                 R.id.action_profile -> {
+                    val i = Intent(this,MainActivity::class.java)
                     i.putExtra("FRAGMENT_TO_LOAD", "profile")
                     startActivity(i)
                 }
@@ -113,7 +113,7 @@ class TrackActivity : AppCompatActivity() {
         var responseBody : JSONObject = JSONObject("{'next':null}")
 
         var client = OkHttpClient()
-        var token = ParseUser.getCurrentUser().getString("accessToken")
+        var token = ParseUser.getCurrentUser().getString("token")
         var httpBuilder : HttpUrl.Builder = HttpUrl.parse(url)!!.newBuilder()
         httpBuilder.addQueryParameter("limit","50")
         val request = Request.Builder()

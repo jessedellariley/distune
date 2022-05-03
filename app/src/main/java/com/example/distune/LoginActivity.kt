@@ -133,7 +133,7 @@ class LoginActivity : AppCompatActivity() {
     }
 
     private fun goToMainActivity() {
-        val i = Intent(this@LoginActivity, MainActivity::class.java)
+        val i = Intent(this@LoginActivity, SplashActivity::class.java)
         startActivity(i)
         finish()
     }

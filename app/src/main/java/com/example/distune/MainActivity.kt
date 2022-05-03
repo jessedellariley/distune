@@ -15,19 +15,22 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        var usersToDiscover = intent.getStringExtra("USERS_TO_DISCOVER")
+        var bundle = Bundle()
+        bundle.putString("USERS_TO_DISCOVER",usersToDiscover)
+
         var fragmentToLoad = intent.getStringExtra("FRAGMENT_TO_LOAD")
 
         val fragmentManager: FragmentManager = supportFragmentManager
 
-        if (fragmentToLoad.equals("discover")) {
-            fragmentManager.beginTransaction().replace(R.id.flMainContainer,DiscoverFragment()).commit()
-            findViewById<BottomNavigationView>(R.id.bottomNavigationView).selectedItemId = R.id.action_discover
-        } else if (fragmentToLoad.equals("profile")) {
+        if (fragmentToLoad.equals("profile")) {
             fragmentManager.beginTransaction().replace(R.id.flMainContainer,ProfileFragment()).commit()
             findViewById<BottomNavigationView>(R.id.bottomNavigationView).selectedItemId = R.id.action_profile
         } else {
             // Set default selection
-            fragmentManager.beginTransaction().replace(R.id.flMainContainer,DiscoverFragment()).commit()
+            var fragment = DiscoverFragment()
+            fragment.arguments = bundle
+            fragmentManager.beginTransaction().replace(R.id.flMainContainer,fragment).commit()
             findViewById<BottomNavigationView>(R.id.bottomNavigationView).selectedItemId = R.id.action_discover
         }
 
@@ -39,6 +42,7 @@ class MainActivity : AppCompatActivity() {
 
                 R.id.action_discover -> {
                     fragmentToShow = DiscoverFragment()
+                    fragmentToShow.arguments = bundle
                 }
                 R.id.action_profile -> {
                     fragmentToShow = ProfileFragment()

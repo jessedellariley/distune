@@ -3,6 +3,7 @@ package com.example.distune
 import android.app.Application
 import com.parse.Parse
 import com.parse.ParseObject
+import com.parse.ParseUser
 
 class DistuneApp: Application() {
     override fun onCreate() {
