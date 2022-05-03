@@ -16,7 +16,7 @@ The goal is to get music recommendations from real people with shared taste.
 - [x] User can discover new users to follow by swiping right or left on their top 3 songs
 - [x] User can display profile information (bio, following, followers)
 - [x] User's playlists appear in profile and can be clicked on and listened to
-- [ ] User can access the music and profiles of those they are following
+- [x] User can access the music and profiles of those they are following
 - [x] User can log out
 
 ### 2. Screen Archetypes

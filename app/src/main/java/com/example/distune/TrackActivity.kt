@@ -67,7 +67,12 @@ class TrackActivity : AppCompatActivity() {
                         for (result in results) {
                             Log.d("TrackActivity", "Found playlist " + result.getName())
                             findViewById<TextView>(R.id.tvPlaylistName).text = result.getName()
-                            findViewById<TextView>(R.id.tvPlaylistUser).text = ParseUser.getCurrentUser().username
+                            try {
+                                findViewById<TextView>(R.id.tvPlaylistUser).text = result.getUser()?.fetchIfNeeded()?.username
+                            } catch (e : ParseException) {
+                                Log.d("TrackActivity", e.toString())
+                                e.printStackTrace()
+                            }
                             Glide.with(applicationContext)
                                 .load(result.getImage())
                                 .into(findViewById(R.id.ivPlaylistCover))

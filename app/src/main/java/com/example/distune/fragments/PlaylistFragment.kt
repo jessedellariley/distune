@@ -23,11 +23,17 @@ class PlaylistFragment : Fragment() {
     lateinit var playlistsRecyclerView: RecyclerView
     lateinit var adapter: PlaylistAdapter
     var allPlaylists: MutableList<Playlist> = mutableListOf()
+    lateinit var userForProfile : ParseUser
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        var username = arguments?.getString("WHICH_USER")
+        val query: ParseQuery<ParseUser> = ParseUser.getQuery()
+        query.whereEqualTo("username", username)
+        var results: MutableList<ParseUser>? = query.find()
+        userForProfile = results!![0]
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_playlist, container, false)
     }
@@ -42,7 +48,11 @@ class PlaylistFragment : Fragment() {
 
         playlistsRecyclerView.layoutManager = LinearLayoutManager(requireContext())
 
-        getCurrentUserPlaylists()
+        if (ParseUser.getCurrentUser().equals(userForProfile)) {
+            getCurrentUserPlaylists()
+        } else {
+            getUserPlaylists()
+        }
     }
 
     private fun getCurrentUserPlaylists() {
@@ -65,7 +75,6 @@ class PlaylistFragment : Fragment() {
                     Log.d("PlaylistFragment", "Retrieved playlists from Spotify")
                     val responseBody = JSONObject(response.body()!!.string())
                     var responseItems = responseBody.getJSONArray("items")
-                    Log.d("PlaylistFragment",responseItems.toString())
                     for (i in 0 until responseItems.length()) {
                         val playlistInfo = responseItems.getJSONObject(i)
                         if (playlistInfo.getJSONObject("owner").getString("display_name").equals(ParseUser.getCurrentUser().username) && playlistInfo["type"].equals("playlist")) {
@@ -103,6 +112,94 @@ class PlaylistFragment : Fragment() {
                                         } else {
                                             var playlist = Playlist()
                                             playlist.setUser(ParseUser.getCurrentUser())
+                                            playlist.setId(playlistInfo.getString("id"))
+                                            playlist.setName(playlistInfo.getString("name"))
+                                            playlist.setImage(playlistInfo.getJSONArray("images").getJSONObject(0).getString("url"))
+                                            playlist.setIsPublic(playlistInfo.getBoolean("public"))
+                                            playlist.setDescription(playlistInfo.getString("description"))
+
+                                            playlist.saveInBackground {
+                                                if (it != null) {
+                                                    it.localizedMessage?.let { message ->
+                                                        Log.e(
+                                                            "PlaylistsFragment",
+                                                            message
+                                                        )
+                                                    }
+                                                }
+                                            }
+                                            allPlaylists.add(playlist)
+                                            adapter.notifyDataSetChanged()
+                                        }
+                                    }
+                                }
+                            })
+                        }
+                    }
+                }
+            }
+        })
+    }
+
+    private fun getUserPlaylists() {
+        var userId = userForProfile.getString("spotifyId")
+        var url = "https://api.spotify.com/v1/users/$userId/playlists"
+        var client = OkHttpClient()
+        var token = ParseUser.getCurrentUser().getString("token")
+        var httpBuilder : HttpUrl.Builder = HttpUrl.parse(url)!!.newBuilder()
+        httpBuilder.addQueryParameter("limit","50")
+        val request = Request.Builder()
+            .addHeader("Authorization", "Bearer $token")
+            .url(httpBuilder.build())
+            .build()
+        client.newCall(request).enqueue(object : Callback {
+            override fun onFailure(call: Call, e: IOException) {
+                e.printStackTrace()
+            }
+
+            override fun onResponse(call: Call, response: Response) {
+                response.use {
+                    if (!response.isSuccessful) throw IOException("Unexpected code $response")
+                    Log.d("PlaylistFragment", "Retrieved playlists from Spotify")
+                    val responseBody = JSONObject(response.body()!!.string())
+                    var responseItems = responseBody.getJSONArray("items")
+                    for (i in 0 until responseItems.length()) {
+                        val playlistInfo = responseItems.getJSONObject(i)
+                        if (playlistInfo.getJSONObject("owner").getString("display_name").equals(userForProfile.username) && playlistInfo["type"].equals("playlist")) {
+                            // Query for a Playlist object with this Spotify ID
+                            val query: ParseQuery<Playlist> = ParseQuery.getQuery(Playlist::class.java)
+                            query.whereEqualTo(Playlist.KEY_ID,playlistInfo.getString("id"))
+                            query.findInBackground(object : FindCallback<Playlist> {
+                                override fun done(results: MutableList<Playlist>?, e: ParseException?) {
+                                    if (e != null) {
+                                        // Something has gone wrong
+                                        Log.e("PlaylistsFragment", "Error fetching playlists")
+                                        e.printStackTrace()
+                                    } else {
+                                        if (results != null && results.size > 0) {
+                                            for (result in results) {
+                                                result.setUser(userForProfile)
+                                                result.setName(playlistInfo.getString("name"))
+                                                result.setImage(playlistInfo.getJSONArray("images").getJSONObject(0).getString("url"))
+                                                result.setIsPublic(playlistInfo.getBoolean("public"))
+                                                result.setDescription(playlistInfo.getString("description"))
+
+                                                result.saveInBackground {
+                                                    if (it != null) {
+                                                        it.localizedMessage?.let { message ->
+                                                            Log.e(
+                                                                "PlaylistsFragment",
+                                                                message
+                                                            )
+                                                        }
+                                                    }
+                                                }
+                                                allPlaylists.add(result)
+                                                adapter.notifyDataSetChanged()
+                                            }
+                                        } else {
+                                            var playlist = Playlist()
+                                            playlist.setUser(userForProfile)
                                             playlist.setId(playlistInfo.getString("id"))
                                             playlist.setName(playlistInfo.getString("name"))
                                             playlist.setImage(playlistInfo.getJSONArray("images").getJSONObject(0).getString("url"))

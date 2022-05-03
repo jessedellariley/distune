@@ -16,20 +16,25 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
 
         var usersToDiscover = intent.getStringExtra("USERS_TO_DISCOVER")
-        var bundle = Bundle()
-        bundle.putString("USERS_TO_DISCOVER",usersToDiscover)
+        var discoverBundle = Bundle()
+        discoverBundle.putString("USERS_TO_DISCOVER",usersToDiscover)
+
+        var profileBundle = Bundle()
+        profileBundle.putString("WHICH_USER",ParseUser.getCurrentUser().username)
 
         var fragmentToLoad = intent.getStringExtra("FRAGMENT_TO_LOAD")
 
         val fragmentManager: FragmentManager = supportFragmentManager
 
         if (fragmentToLoad.equals("profile")) {
-            fragmentManager.beginTransaction().replace(R.id.flMainContainer,ProfileFragment()).commit()
+            var fragment = ProfileFragment()
+            fragment.arguments = profileBundle
+            fragmentManager.beginTransaction().replace(R.id.flMainContainer,fragment).commit()
             findViewById<BottomNavigationView>(R.id.bottomNavigationView).selectedItemId = R.id.action_profile
         } else {
             // Set default selection
             var fragment = DiscoverFragment()
-            fragment.arguments = bundle
+            fragment.arguments = discoverBundle
             fragmentManager.beginTransaction().replace(R.id.flMainContainer,fragment).commit()
             findViewById<BottomNavigationView>(R.id.bottomNavigationView).selectedItemId = R.id.action_discover
         }
@@ -42,10 +47,11 @@ class MainActivity : AppCompatActivity() {
 
                 R.id.action_discover -> {
                     fragmentToShow = DiscoverFragment()
-                    fragmentToShow.arguments = bundle
+                    fragmentToShow.arguments = discoverBundle
                 }
                 R.id.action_profile -> {
                     fragmentToShow = ProfileFragment()
+                    fragmentToShow.arguments = profileBundle
                 }
                 R.id.action_logout -> {
                     ParseUser.logOutInBackground()

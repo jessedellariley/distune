@@ -1,34 +1,52 @@
 package com.example.distune
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
-import com.example.distune.fragments.usersToDiscover
-import com.parse.*
+import androidx.fragment.app.FragmentManager
+import com.example.distune.fragments.DiscoverFragment
+import com.example.distune.fragments.ProfileFragment
+import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.parse.ParseUser
 
 class FollowProfileActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_follow_profile)
 
-        lateinit var user: ParseUser
+        findViewById<BottomNavigationView>(R.id.profileBottomNav).selectedItemId = R.id.action_invisible
+
         var username = intent.getStringExtra(FOLLOWER_EXTRA)
-        val query: ParseQuery<ParseUser> = ParseUser.getQuery()
-        query.whereEqualTo("username", username)
-        query.findInBackground(object : FindCallback<ParseUser> {
-            override fun done(results: MutableList<ParseUser>?, e: ParseException?) {
-                if (e != null) {
-                    // Something has gone wrong
-                    Log.e("FollowProfileActivity", "Error loading users")
-                    e.printStackTrace()
-                } else {
-                    if (results != null && results.size > 0) {
-                        for (result in results) {
-                            user = result
-                        }
-                    }
+
+        var bundle = Bundle()
+        bundle.putString("WHICH_USER", username)
+        var fragment = ProfileFragment()
+        fragment.arguments = bundle
+        supportFragmentManager.beginTransaction().replace(R.id.followProfileContainer,fragment).commit()
+
+        findViewById<BottomNavigationView>(R.id.profileBottomNav).setOnItemSelectedListener {
+                item ->
+            when(item.itemId) {
+
+                R.id.action_discover -> {
+                    val i = Intent(this,SplashActivity::class.java)
+                    startActivity(i)
+                }
+                R.id.action_profile -> {
+                    val i = Intent(this,MainActivity::class.java)
+                    i.putExtra("FRAGMENT_TO_LOAD", "profile")
+                    startActivity(i)
+                }
+                R.id.action_logout -> {
+                    ParseUser.logOutInBackground()
+                    val i = Intent(this,LoginActivity::class.java)
+                    i.putExtra("LOGGED_OUT","logged_out")
+                    startActivity(i)
                 }
             }
-        })
+
+            // Return true to say that we've handle this user interaction on the item
+            true
+        }
     }
 }

@@ -22,11 +22,17 @@ class FollowingFragment : Fragment() {
     lateinit var followingRecyclerView: RecyclerView
     lateinit var adapter: FollowingAdapter
     var allFollowing: MutableList<Follower> = mutableListOf()
+    lateinit var userForProfile : ParseUser
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        var username = arguments?.getString("WHICH_USER")
+        val query: ParseQuery<ParseUser> = ParseUser.getQuery()
+        query.whereEqualTo("username", username)
+        var results: MutableList<ParseUser>? = query.find()
+        userForProfile = results!![0]
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_following, container, false)
     }
@@ -46,7 +52,7 @@ class FollowingFragment : Fragment() {
 
     private fun getFollowing() {
         val query: ParseQuery<Follower> = ParseQuery.getQuery(Follower::class.java)
-        query.whereEqualTo(Follower.KEY_FOLLOWER,ParseUser.getCurrentUser())
+        query.whereEqualTo(Follower.KEY_FOLLOWER, userForProfile)
         query.findInBackground(object : FindCallback<Follower> {
             override fun done(results: MutableList<Follower>?, e: ParseException?) {
                 if (e != null) {
