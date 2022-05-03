@@ -12,6 +12,7 @@ class DistuneApp: Application() {
         ParseObject.registerSubclass(Playlist::class.java)
         ParseObject.registerSubclass(Track::class.java)
         ParseObject.registerSubclass(Favorite::class.java)
+        ParseObject.registerSubclass(Follower::class.java)
 
         Parse.initialize(
             Parse.Configuration.Builder(this)

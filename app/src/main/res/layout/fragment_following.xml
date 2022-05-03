@@ -5,10 +5,15 @@
     android:layout_height="match_parent"
     tools:context=".fragments.FollowingFragment">
 
-    <!-- TODO: Update blank fragment layout -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/followingRecyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
     <TextView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:visibility="invisible"
         android:text="You are not following anyone yet" />
 
 </FrameLayout>

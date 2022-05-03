@@ -1,34 +1,27 @@
 package com.example.distune.fragments
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import com.example.distune.R
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import com.example.distune.*
+import com.parse.FindCallback
+import com.parse.ParseException
+import com.parse.ParseQuery
+import com.parse.ParseUser
+import okhttp3.*
+import org.json.JSONObject
+import java.io.IOException
 
-// TODO: Rename parameter arguments, choose names that match
-// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-private const val ARG_PARAM1 = "param1"
-private const val ARG_PARAM2 = "param2"
-
-/**
- * A simple [Fragment] subclass.
- * Use the [FollowingFragment.newInstance] factory method to
- * create an instance of this fragment.
- */
 class FollowingFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-    private var param1: String? = null
-    private var param2: String? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        arguments?.let {
-            param1 = it.getString(ARG_PARAM1)
-            param2 = it.getString(ARG_PARAM2)
-        }
-    }
+    lateinit var followingRecyclerView: RecyclerView
+    lateinit var adapter: FollowingAdapter
+    var allFollowing: MutableList<Follower> = mutableListOf()
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -38,23 +31,37 @@ class FollowingFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_following, container, false)
     }
 
-    companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment FollowingFragment.
-         */
-        // TODO: Rename and change types and number of parameters
-        @JvmStatic
-        fun newInstance(param1: String, param2: String) =
-            FollowingFragment().apply {
-                arguments = Bundle().apply {
-                    putString(ARG_PARAM1, param1)
-                    putString(ARG_PARAM2, param2)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        followingRecyclerView = view.findViewById(R.id.followingRecyclerView)
+
+        adapter = FollowingAdapter(requireContext(), allFollowing)
+        followingRecyclerView.adapter = adapter
+
+        followingRecyclerView.layoutManager = LinearLayoutManager(requireContext())
+
+        getFollowing()
+    }
+
+    private fun getFollowing() {
+        val query: ParseQuery<Follower> = ParseQuery.getQuery(Follower::class.java)
+        query.whereEqualTo(Follower.KEY_FOLLOWER,ParseUser.getCurrentUser())
+        query.findInBackground(object : FindCallback<Follower> {
+            override fun done(results: MutableList<Follower>?, e: ParseException?) {
+                if (e != null) {
+                    // Something has gone wrong
+                    Log.e("FollowingFragment", "Error fetching following")
+                    e.printStackTrace()
+                } else {
+                    if (results != null && results.size > 0) {
+                        for (result in results) {
+                            allFollowing.add(result)
+                            adapter.notifyDataSetChanged()
+                        }
+                    }
                 }
             }
+        })
     }
 }

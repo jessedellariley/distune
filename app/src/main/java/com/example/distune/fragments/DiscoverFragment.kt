@@ -10,7 +10,12 @@ import android.widget.ImageView
 import android.widget.TextView
 import androidx.constraintlayout.widget.ConstraintLayout
 import com.bumptech.glide.Glide
+import com.example.distune.Follower
 import com.example.distune.R
+import com.parse.FindCallback
+import com.parse.ParseException
+import com.parse.ParseQuery
+import com.parse.ParseUser
 import org.json.JSONArray
 
 lateinit var usersToDiscover : JSONArray
@@ -36,7 +41,7 @@ class DiscoverFragment : Fragment() {
         var swipeLeft = view.findViewById<ImageView>(R.id.swipeLeft)
         var username = view.findViewById<TextView>(R.id.tv_username)
         var bio = view.findViewById<TextView>(R.id.tv_bio)
-        //var image = view.findViewById<ImageView>(R.id.iv_profile_image)
+        // var image = view.findViewById<ImageView>(R.id.iv_profile_image)
         var discover1Title = view.findViewById<TextView>(R.id.discover1Title)
         var discover1Album = view.findViewById<ImageView>(R.id.discover1Album)
         var discover1Artist = view.findViewById<TextView>(R.id.discover1Artist)
@@ -114,6 +119,35 @@ class DiscoverFragment : Fragment() {
             // On swipe right
             swipeRight.setOnClickListener() {
                 // follow user so that content can be accessed later
+                var follower = Follower()
+                follower.setFollower(ParseUser.getCurrentUser())
+                val query: ParseQuery<ParseUser> = ParseUser.getQuery()
+                query.whereEqualTo("username", usersToDiscover.getJSONObject(i).getString("username"))
+                query.findInBackground(object : FindCallback<ParseUser> {
+                    override fun done(results: MutableList<ParseUser>?, e: ParseException?) {
+                        if (e != null) {
+                            // Something has gone wrong
+                            Log.e("DiscoverFragment", "Error loading users")
+                            e.printStackTrace()
+                        } else {
+                            if (results != null && results.size > 0) {
+                                for (result in results) {
+                                    follower.setUser(result)
+                                    follower.saveInBackground {
+                                        if (it != null) {
+                                            it.localizedMessage?.let { message ->
+                                                Log.e(
+                                                    "PlaylistsFragment",
+                                                    message
+                                                )
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                })
                 // increase i and check if valid
                 i++
                 // if valid, load another user
