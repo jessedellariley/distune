@@ -18,6 +18,10 @@ The goal is to get music recommendations from real people with shared taste.
 - [x] User's playlists appear in profile and can be clicked on and listened to
 - [x] User can access the music and profiles of those they are following
 - [x] User can log out
+- [ ] New users can complete a quiz to personalize their discover page
+- [ ] Users can edit which songs appear when they are discovered by other users
+- [ ] Users can break down their top songs by genre
+- [ ] UI helps users easily navigate the app, listen to music, and find new users to follow
 
 ### Video Walkthrough
 
